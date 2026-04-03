@@ -1,0 +1,88 @@
+@extends('layouts.admin')
+
+@section('content')
+    <div class="p-6 md:p-10 bg-gray-50 min-h-screen">
+        <div class="mb-8 flex justify-between items-center">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-800">Tambah Destinasi Baru</h1>
+                <p class="text-gray-500 text-sm">Isi detail informasi untuk destinasi wisata baru.</p>
+            </div>
+            <a href="{{ route('admin.destinations.index') }}"
+                class="text-gray-600 hover:text-gray-800 flex items-center gap-2 transition">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd"
+                        d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+                        clip-rule="evenodd" />
+                </svg>
+                Kembali
+            </a>
+        </div>
+
+        <form action="{{ route('admin.destinations.store') }}" method="POST" enctype="multipart/form-data"
+            class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            @csrf
+            <div class="p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+                    <div class="space-y-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Destinasi</label>
+                            <input type="text" name="name" placeholder="Contoh: Taman Laut Bunaken"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 focus:border-orange-500 outline-none transition"
+                                required>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
+                                <select name="category" class="w-full px-4 py-3 rounded-xl ...">
+                                    <option value="Wisata Alam">Wisata Alam</option>
+                                    <option value="Wisata Budaya">Wisata Budaya</option>
+                                    <option value="Wisata Buatan">Wisata Buatan</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Harga (Rp)</label>
+                                <input type="number" name="price" placeholder="250000"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition"
+                                    required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Lokasi
+                                    (Kota/Kabupaten)</label>
+                                <input type="text" name="location" placeholder="Contoh: Manado, Sulawesi Utara"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition"
+                                    required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Foto Sampul</label>
+                            <div
+                                class="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-orange-400 transition">
+                                <input type="file" name="cover_image"
+                                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100"
+                                    required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi Lengkap</label>
+                        <textarea name="description" rows="10" placeholder="Jelaskan keindahan destinasi ini..."
+                            class="w-full flex-grow px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition resize-none"></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-8 py-5 flex justify-end gap-4 border-t border-gray-100">
+                <button type="reset"
+                    class="px-6 py-2.5 text-sm font-medium text-gray-600 hover:text-gray-800 transition">Reset</button>
+                <button type="submit"
+                    class="px-8 py-2.5 bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-700 active:scale-95 transition-all">
+                    Simpan Destinasi
+                </button>
+            </div>
+        </form>
+    </div>
+@endsection
