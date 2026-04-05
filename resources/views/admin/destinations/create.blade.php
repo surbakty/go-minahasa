@@ -18,12 +18,14 @@
             </a>
         </div>
 
+        {{-- 1. Form sudah menggunakan enctype="multipart/form-data" --}}
         <form action="{{ route('admin.destinations.store') }}" method="POST" enctype="multipart/form-data"
             class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             @csrf
             <div class="p-8">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
+                    {{-- KOLOM KIRI --}}
                     <div class="space-y-6">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Destinasi</label>
@@ -35,7 +37,8 @@
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
-                                <select name="category" class="w-full px-4 py-3 rounded-xl ...">
+                                <select name="category"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition">
                                     <option value="Wisata Alam">Wisata Alam</option>
                                     <option value="Wisata Budaya">Wisata Budaya</option>
                                     <option value="Wisata Buatan">Wisata Buatan</option>
@@ -43,21 +46,21 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Harga (Rp)</label>
-                                <input type="number" name="price" placeholder="250000"
+                                <input type="number" name="price" value="0" min="0"
                                     class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition"
-                                    required>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Lokasi
-                                    (Kota/Kabupaten)</label>
-                                <input type="text" name="location" placeholder="Contoh: Manado, Sulawesi Utara"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition"
-                                    required>
+                                    placeholder="Isi 0 jika Gratis">
                             </div>
                         </div>
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Foto Sampul</label>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Lokasi (Kota/Kabupaten)</label>
+                            <input type="text" name="location" placeholder="Contoh: Manado, Sulawesi Utara"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition"
+                                required>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Foto Sampul Utama</label>
                             <div
                                 class="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-orange-400 transition">
                                 <input type="file" name="cover_image"
@@ -65,12 +68,57 @@
                                     required>
                             </div>
                         </div>
+
+                        {{-- 2. Input Multi-Upload untuk Galeri yang sudah disesuaikan --}}
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Cuplikan Keindahan
+                                (Gallery)</label>
+                            <div
+                                class="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-orange-400 transition">
+                                <input type="file" name="gallery[]" multiple
+                                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
+                            </div>
+                            <p class="text-xs text-gray-500 mt-2 font-medium">*Anda bisa memilih lebih dari satu foto
+                                sekaligus (tahan Ctrl/Command)</p>
+                        </div>
                     </div>
 
-                    <div class="flex flex-col">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi Lengkap</label>
-                        <textarea name="description" rows="10" placeholder="Jelaskan keindahan destinasi ini..."
-                            class="w-full flex-grow px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition resize-none"></textarea>
+                    {{-- KOLOM KANAN --}}
+                    <div class="flex flex-col space-y-6">
+                        <div class="flex flex-col flex-grow">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi Lengkap</label>
+                            <textarea name="description" rows="8" placeholder="Jelaskan keindahan destinasi ini..."
+                                class="w-full flex-grow px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition resize-none"></textarea>
+                        </div>
+
+                        {{-- Checkbox untuk Fasilitas --}}
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-3">Fasilitas Tersedia</label>
+                            <div class="grid grid-cols-2 gap-y-3 gap-x-4 bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                                @php
+                                    $availableFacilities = [
+                                        'wifi' => 'Free WiFi',
+                                        'pemandu' => 'Pemandu Wisata',
+                                        'akses24' => 'Akses 24 Jam',
+                                        'parkir' => 'Area Parkir',
+                                        'restoran' => 'Restoran',
+                                        'toilet' => 'Toilet Umum',
+                                        'ibadah' => 'Tempat Ibadah',
+                                        'penginapan' => 'Penginapan',
+                                        'spot_foto' => 'Spot Foto'
+                                    ];
+                                @endphp
+
+                                @foreach($availableFacilities as $value => $label)
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" name="facilities[]" value="{{ $value }}"
+                                            class="w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                        <span
+                                            class="text-sm text-gray-600 group-hover:text-gray-900 transition-colors">{{ $label }}</span>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,8 +1,11 @@
 <?php
 
-use App\Http\Controllers\Visitor\LandingPageController;
-use App\Http\Controllers\Admin\DestinationController;
 use Illuminate\Support\Facades\Route;
+
+// Import Controller dengan Namespace yang tepat
+use App\Http\Controllers\Visitor\LandingPageController;
+use App\Http\Controllers\DestinationController; // Controller Publik (di folder utama)
+use App\Http\Controllers\Admin\DestinationController as AdminDestinationController; // Controller Admin (di folder Admin)
 
 /*
 |--------------------------------------------------------------------------
@@ -10,35 +13,39 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// --- Bagian Pengunjung (Visitor) ---
+// ==========================================
+// --- BAGIAN PENGUNJUNG (VISITOR) ---
+// ==========================================
+
+// 1. Halaman Landing (Beranda)
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
 
-Route::get('/destinasi', function () {
-    return view('visitor.index_destinasi'); 
-})->name('destinasi.index');
+// 2. Daftar Destinasi (Jelajah)
+// Gunakan 'destinations.index' agar konsisten dengan standar Laravel
+Route::get('/destinasi', [DestinationController::class, 'index'])->name('destinations.index');
 
-// Route Statis untuk Dummy Detail
-Route::get('/destination/bunaken', function () {
-    return view('visitor.show'); 
-})->name('destination.bunaken');
+// 3. Detail Destinasi (Dinamis berdasarkan Slug)
+Route::get('/destinasi/{slug}', [DestinationController::class, 'show'])->name('destinations.show');
 
-// Route Dinamis
-Route::get('/destination/{slug}', [LandingPageController::class, 'show'])->name('destination.show');
-
+// 4. Halaman Statis
 Route::get('/tentang-kami', function () {
     return view('visitor.about');
 })->name('about');
 
 
-// --- Bagian Admin (Manual Admin, Bukan Filament) ---
+// ==========================================
+// --- BAGIAN ADMIN (Go-Minahasa PANEL) ---
+// ==========================================
+
 Route::prefix('admin')->name('admin.')->group(function () {
     
-    // Halaman Dashboard Utama
+    // Dashboard Utama Admin
     Route::get('/', function () {
         return view('admin.dashboard');
     })->name('dashboard');
 
     // Mengelola Semua Fitur Destinasi (CRUD)
-    Route::resource('destinations', DestinationController::class);
+    // Nama rute otomatis menjadi: admin.destinations.index, admin.destinations.create, dll.
+    Route::resource('destinations', AdminDestinationController::class);
     
 });

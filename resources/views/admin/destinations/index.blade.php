@@ -44,9 +44,20 @@
                             <td class="py-4 px-8 text-sm text-gray-600 italic">
                                 {{ $destination->location ?? 'Lokasi belum diatur' }}
                             </td>
-                            <td class="py-4 px-8 font-medium text-orange-600">
-                                Rp {{ number_format($destination->price, 0, ',', '.') }}
+
+                            <td class="py-4 px-8 font-medium">
+                                @if($destination->price == 0)
+                                    <span
+                                        class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-[10px] font-bold uppercase tracking-wider border border-green-200">
+                                        Gratis
+                                    </span>
+                                @else
+                                    <span class="text-orange-600 font-bold">
+                                        Rp {{ number_format($destination->price, 0, ',', '.') }}
+                                    </span>
+                                @endif
                             </td>
+
                             <td class="py-4 px-8">
                                 <div class="flex justify-center items-center gap-2">
                                     <a href="{{ route('admin.destinations.edit', $destination->id) }}"

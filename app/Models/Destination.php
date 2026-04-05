@@ -12,7 +12,8 @@ class Destination extends Model
     // Memberitahu Laravel bahwa kolom 'gallery' adalah array (JSON)
     protected $casts = [
         'gallery' => 'array',
+        'facilities' => 'array',
     ];
 
-    protected $fillable = ['name', 'slug', 'location', 'category', 'description', 'price', 'cover_image'];
+    protected $fillable = ['name', 'slug', 'location', 'category', 'description', 'price', 'cover_image', 'gallery', 'facilities'];
 }

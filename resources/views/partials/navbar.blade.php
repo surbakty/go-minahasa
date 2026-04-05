@@ -20,7 +20,7 @@
                 </a>
 
                 {{-- Gunakan ID #explore jika kamu ingin scroll di landing page --}}
-                <a href="{{ route('destinasi.index') }}"
+                <a href="{{ route('destinations.index') }}"
                     class="text-sm font-bold {{ request()->routeIs('destinasi.index') ? 'text-orange-600' : 'text-slate-500' }} hover:text-orange-600 transition relative group">
                     Destinasi
                     <span

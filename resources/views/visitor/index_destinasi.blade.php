@@ -10,14 +10,12 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* OPTIMASI: Memberitahu browser untuk menggunakan akselerasi GPU */
         .desti-card-optimized {
             will-change: transform;
             backface-visibility: hidden;
             transform: translateZ(0);
         }
 
-        /* Menghilangkan scrollbar pada filter jika overflow */
         .no-scrollbar::-webkit-scrollbar {
             display: none;
         }
@@ -60,24 +58,29 @@
         <div class="container mx-auto px-6">
             <div
                 class="flex flex-col lg:flex-row lg:items-center justify-between gap-6 border-b border-slate-100 pb-10 mb-12">
-                {{-- Filter Bar --}}
+
+                {{-- Filter Bar Dinamis --}}
                 <div class="flex items-center gap-3 overflow-x-auto no-scrollbar py-2">
                     <span class="text-slate-400 font-bold text-xs uppercase tracking-widest mr-2 text-nowrap">Filter:</span>
-                    <button
-                        class="px-6 py-2.5 rounded-full bg-orange-600 text-white text-xs font-bold shadow-lg shadow-orange-500/20">Semua</button>
-                    <button
-                        class="px-6 py-2.5 rounded-full border border-slate-200 text-slate-500 text-xs font-bold hover:border-orange-500 hover:text-orange-500 transition-all text-nowrap">Wisata
-                        Alam</button>
-                    <button
-                        class="px-6 py-2.5 rounded-full border border-slate-200 text-slate-500 text-xs font-bold hover:border-orange-500 hover:text-orange-500 transition-all text-nowrap">Wisata
-                        Budaya</button>
-                    <button
-                        class="px-6 py-2.5 rounded-full border border-slate-200 text-slate-500 text-xs font-bold hover:border-orange-500 hover:text-orange-500 transition-all text-nowrap">Wisata
-                        Buatan</button>
+
+                    <a href="{{ route('destinations.index') }}"
+                        class="px-6 py-2.5 rounded-full text-xs font-bold transition-all {{ !request('category') || request('category') == 'Semua' ? 'bg-orange-600 text-white shadow-lg shadow-orange-500/20' : 'border border-slate-200 text-slate-500 hover:border-orange-500 hover:text-orange-500' }}">
+                        Semua
+                    </a>
+
+                    @foreach(['Wisata Alam', 'Wisata Budaya', 'Wisata Buatan'] as $cat)
+                        <a href="{{ route('destinations.index', ['category' => $cat, 'search' => request('search')]) }}"
+                            class="px-6 py-2.5 rounded-full border text-xs font-bold transition-all text-nowrap {{ request('category') == $cat ? 'bg-orange-600 text-white border-orange-600 shadow-lg shadow-orange-500/20' : 'border-slate-200 text-slate-500 hover:border-orange-500 hover:text-orange-500' }}">
+                            {{ $cat }}
+                        </a>
+                    @endforeach
                 </div>
 
-                {{-- Search Bar --}}
-                <div class="w-full lg:w-80 relative group">
+                {{-- Search Bar Dinamis --}}
+                <form action="{{ route('destinations.index') }}" method="GET" class="w-full lg:w-80 relative group">
+                    @if(request('category'))
+                        <input type="hidden" name="category" value="{{ request('category') }}">
+                    @endif
                     <div
                         class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-orange-500 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -85,29 +88,32 @@
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                         </svg>
                     </div>
-                    <input type="text" placeholder="Cari destinasi..."
+                    <input type="text" name="search" value="{{ request('search') }}" placeholder="Cari destinasi..."
                         class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 placeholder:text-slate-400 focus:ring-2 focus:ring-orange-500 focus:bg-white focus:outline-none transition-all shadow-sm">
-                </div>
+                </form>
             </div>
 
-            {{-- Grid Destinasi --}}
+            {{-- Grid Destinasi Dinamis --}}
             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-                @for ($i = 1; $i <= 10; $i++)
+                @forelse($destinations as $destination)
                     <div
                         class="desti-card-optimized group relative h-80 rounded-[2rem] overflow-hidden border border-slate-100 transition-all duration-300 hover:-translate-y-2 hover:shadow-xl">
-                        <img src="https://images.unsplash.com/photo-1542332213-31f87348057f?auto=format&fit=crop&q=60&w=400&sig={{$i}}"
-                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            alt="Destinasi">
+                        {{-- Cover Image dari Storage --}}
+                        <img src="{{ asset('storage/' . $destination->cover_image) }}"
+                            class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                            alt="{{ $destination->name }}">
 
                         <div
-                            class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-90 transition-opacity">
+                            class="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-90 transition-opacity">
                         </div>
 
                         <div class="absolute bottom-6 left-6 right-6">
-                            <h3 class="text-lg font-bold text-white mb-2 leading-tight">Nama Wisata {{$i}}</h3>
+                            <span
+                                class="text-[10px] text-orange-400 font-bold uppercase tracking-wider mb-1 block">{{ $destination->category }}</span>
+                            <h3 class="text-lg font-bold text-white mb-2 leading-tight">{{ $destination->name }}</h3>
 
-                            {{-- SESUAI REQUEST: Link diarahkan ke /destination/bunaken --}}
-                            <a href="/destination/bunaken"
+                            {{-- Link dinamis menggunakan Slug --}}
+                            <a href="{{ route('destinations.show', $destination->slug) }}"
                                 class="text-[10px] font-black text-orange-500 uppercase tracking-[0.2em] flex items-center gap-2 group/link">
                                 LIHAT DETAIL
                                 <svg class="w-3 h-3 transform group-hover/link:translate-x-1 transition-transform" fill="none"
@@ -118,17 +124,19 @@
                             </a>
                         </div>
                     </div>
-                @endfor
+                @empty
+                    {{-- Tampilan jika tidak ada data --}}
+                    <div class="col-span-full py-20 text-center">
+                        <p class="text-slate-400 font-medium">Tidak ada destinasi yang ditemukan.</p>
+                        <a href="{{ route('destinations.index') }}" class="text-orange-500 font-bold mt-2 inline-block">Reset
+                            Pencarian</a>
+                    </div>
+                @endforelse
             </div>
 
-            {{-- Pagination Simple --}}
-            <div class="mt-16 flex justify-center items-center gap-2">
-                <button
-                    class="w-10 h-10 flex items-center justify-center rounded-xl bg-orange-600 text-white font-bold shadow-lg shadow-orange-500/30">1</button>
-                <button
-                    class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition">2</button>
-                <button
-                    class="w-10 h-10 flex items-center justify-center rounded-xl border border-slate-200 text-slate-600 font-bold hover:bg-slate-50 transition">3</button>
+            {{-- Info Jumlah Data --}}
+            <div class="mt-16 flex justify-center text-slate-400 text-xs font-bold uppercase tracking-widest">
+                Menampilkan {{ $destinations->count() }} Destinasi
             </div>
         </div>
     </section>
