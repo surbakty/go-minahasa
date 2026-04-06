@@ -19,6 +19,17 @@
         </div>
 
         {{-- 1. Form sudah menggunakan enctype="multipart/form-data" --}}
+
+        @if ($errors->any())
+            <div class="mb-6 p-4 bg-red-500 text-white rounded-2xl shadow-lg shadow-red-200">
+                <p class="font-bold mb-2 uppercase tracking-widest text-xs">Gagal Menyimpan:</p>
+                <ul class="list-disc ml-5 text-sm">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
         <form action="{{ route('admin.destinations.store') }}" method="POST" enctype="multipart/form-data"
             class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
             @csrf

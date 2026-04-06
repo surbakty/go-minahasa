@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-// Wajib mengimpor Controller utama karena posisi file ini ada di sub-folder
 use App\Http\Controllers\Controller; 
 use App\Models\Destination;
 use Illuminate\Http\Request;
@@ -17,7 +16,6 @@ class DestinationController extends Controller
     public function index()
     {
         $destinations = Destination::latest()->get();
-        // Mengarahkan ke folder resources/views/admin/destinations/index.blade.php
         return view('admin.destinations.index', compact('destinations'));
     }
 
@@ -34,18 +32,18 @@ class DestinationController extends Controller
      */
     public function store(Request $request)
     {
+        // Validasi: cover_image wajib (required) saat tambah baru
         $request->validate([
             'name' => 'required|string|max:255',
             'location' => 'required|string',
             'category' => 'required',
             'price' => 'required|numeric',
             'description' => 'required',
-            'cover_image' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+            'cover_image' => 'required|image|max:2048', // Semua format gambar diizinkan
+            'gallery.*' => 'image|max:2048', // Validasi tiap file di gallery
         ]);
 
         $data = $request->all();
-        
-        // Membuat slug otomatis dari nama destinasi
         $data['slug'] = Str::slug($request->name);
 
         // Upload Cover Image
@@ -77,7 +75,6 @@ class DestinationController extends Controller
      */
     public function edit(Destination $destination)
     {
-        // Decode data JSON agar bisa dibaca di form checkbox/gallery
         $facilities = json_decode($destination->facilities, true) ?? [];
         $gallery = json_decode($destination->gallery, true) ?? [];
 
@@ -89,10 +86,15 @@ class DestinationController extends Controller
      */
     public function update(Request $request, Destination $destination)
     {
+        // Validasi: cover_image bersifat nullable saat update
         $request->validate([
             'name' => 'required|string|max:255',
             'location' => 'required|string',
+            'category' => 'required', // Tambahkan agar tidak hilang saat update
             'price' => 'required|numeric',
+            'description' => 'required',
+            'cover_image' => 'nullable|image|max:2048', // Opsional, jika mau ganti saja
+            'gallery.*' => 'image|max:2048',
         ]);
 
         $data = $request->all();
@@ -100,10 +102,26 @@ class DestinationController extends Controller
 
         // Update Cover Image jika ada file baru
         if ($request->hasFile('cover_image')) {
+            // Hapus foto lama jika ada
             if ($destination->cover_image) {
                 Storage::disk('public')->delete($destination->cover_image);
             }
             $data['cover_image'] = $request->file('cover_image')->store('destinations/covers', 'public');
+        }
+
+        // Update Gallery (Logika sederhana: ganti semua jika ada upload baru)
+        if ($request->hasFile('gallery')) {
+            // Hapus gallery lama dari storage
+            $oldGallery = json_decode($destination->gallery, true) ?? [];
+            foreach ($oldGallery as $oldFile) {
+                Storage::disk('public')->delete($oldFile);
+            }
+
+            $galleryPaths = [];
+            foreach ($request->file('gallery') as $file) {
+                $galleryPaths[] = $file->store('destinations/gallery', 'public');
+            }
+            $data['gallery'] = json_encode($galleryPaths);
         }
 
         // Update Facilities
@@ -119,9 +137,14 @@ class DestinationController extends Controller
      */
     public function destroy(Destination $destination)
     {
-        // Hapus file gambar dari storage sebelum hapus data database
         if ($destination->cover_image) {
             Storage::disk('public')->delete($destination->cover_image);
+        }
+
+        // Hapus juga file gallery saat destinasi dihapus
+        $gallery = json_decode($destination->gallery, true) ?? [];
+        foreach ($gallery as $file) {
+            Storage::disk('public')->delete($file);
         }
 
         $destination->delete();

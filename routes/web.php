@@ -2,10 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Import Controller dengan Namespace yang tepat
+// Import Controller Visitor
 use App\Http\Controllers\Visitor\LandingPageController;
-use App\Http\Controllers\DestinationController; // Controller Publik (di folder utama)
-use App\Http\Controllers\Admin\DestinationController as AdminDestinationController; // Controller Admin (di folder Admin)
+use App\Http\Controllers\DestinationController as PublicDestinationController;
+
+// Import Controller Admin & Auth
+use App\Http\Controllers\Admin\DestinationController as AdminDestinationController;
+use App\Http\Controllers\Admin\DashboardController; 
+use App\Http\Controllers\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -16,36 +20,56 @@ use App\Http\Controllers\Admin\DestinationController as AdminDestinationControll
 // ==========================================
 // --- BAGIAN PENGUNJUNG (VISITOR) ---
 // ==========================================
-
-// 1. Halaman Landing (Beranda)
 Route::get('/', [LandingPageController::class, 'index'])->name('landing');
+Route::get('/destinasi', [PublicDestinationController::class, 'index'])->name('destinations.index');
+Route::get('/destinasi/{slug}', [PublicDestinationController::class, 'show'])->name('destinations.show');
 
-// 2. Daftar Destinasi (Jelajah)
-// Gunakan 'destinations.index' agar konsisten dengan standar Laravel
-Route::get('/destinasi', [DestinationController::class, 'index'])->name('destinations.index');
-
-// 3. Detail Destinasi (Dinamis berdasarkan Slug)
-Route::get('/destinasi/{slug}', [DestinationController::class, 'show'])->name('destinations.show');
-
-// 4. Halaman Statis
 Route::get('/tentang-kami', function () {
     return view('visitor.about');
 })->name('about');
 
+Route::get('/pusat-bantuan', function () {
+    return view('visitor.help');
+})->name('help');
+
+Route::get('/syarat-ketentuan', function () {
+    return view('visitor.terms');
+})->name('terms');
+
+Route::get('/kebijakan-privasi', function () {
+    return view('visitor.privacy');
+})->name('privacy');
+
 
 // ==========================================
-// --- BAGIAN ADMIN (Go-Minahasa PANEL) ---
+// --- BAGIAN AUTENTIKASI (LOGIN/LOGOUT) ---
 // ==========================================
+Route::get('/admin/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/admin/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-Route::prefix('admin')->name('admin.')->group(function () {
+
+// ==========================================
+// --- BAGIAN ADMIN (DIPROTEKSI ROLE) ---
+// ==========================================
+Route::middleware(['auth'])->prefix('admin')->name('admin.')->group(function () {
     
-    // Dashboard Utama Admin
-    Route::get('/', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    // 1. Dashboard: Bisa diakses oleh semua (Admin & Editor)
+    // Sekarang memanggil DashboardController agar data Statistik otomatis terhitung
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Mengelola Semua Fitur Destinasi (CRUD)
-    // Nama rute otomatis menjadi: admin.destinations.index, admin.destinations.create, dll.
+    // 2. Kelola Destinasi: Bisa diakses oleh semua (Admin & Editor)
     Route::resource('destinations', AdminDestinationController::class);
-    
-});
+
+    // 3. Area Khusus ADMINISTRATOR (Felix)
+    // Gunakan middleware 'role:admin' yang sudah kita daftarkan sebelumnya
+    Route::middleware(['role:admin'])->group(function () {
+        
+    Route::middleware(['role:admin'])->group(function () {
+        // Rute untuk kelola staff/user
+        Route::resource('users', \App\Http\Controllers\Admin\UserController::class);
+    });
+        // Route::get('/settings', [SettingController::class, 'index'])->name('settings');
+        // Route::resource('users', UserController::class)->name('users');
+    });
+}); 
