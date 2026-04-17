@@ -15,8 +15,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        // Mengambil semua user kecuali yang sedang login saat ini
-        $users = User::where('id', '!=', Auth::id())->get();
+        // Mengambil semua data akun
+        $users = User::all();
         
         return view('admin.users.index', compact('users'));
     }

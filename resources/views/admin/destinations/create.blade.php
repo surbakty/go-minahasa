@@ -46,13 +46,13 @@
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
-                                <select name="category"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-orange-500 outline-none transition">
-                                    <option value="Wisata Alam">Wisata Alam</option>
-                                    <option value="Wisata Budaya">Wisata Budaya</option>
-                                    <option value="Wisata Buatan">Wisata Buatan</option>
+                            <div class="mb-4">
+                                <label class="block text-sm font-bold text-slate-700 mb-2">Kategori Wisata</label>
+                                <select name="category_id" class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-2 focus:ring-orange-500 outline-none text-slate-600" required>
+                                    <option value="">-- Pilih Kategori --</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div>

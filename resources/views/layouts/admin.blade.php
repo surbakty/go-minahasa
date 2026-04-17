@@ -13,66 +13,99 @@
 <body class="bg-slate-50 font-sans antialiased">
     <div class="flex min-h-screen">
         {{-- Sidebar --}}
-        <aside class="w-64 bg-slate-900 text-slate-300 flex-shrink-0 hidden md:flex flex-col shadow-2xl">
-            <div class="p-6">
+        <aside class="w-72 bg-slate-900 text-slate-300 flex-shrink-0 hidden md:flex flex-col shadow-2xl">
+            <div class="p-8">
                 <h1 class="text-2xl font-black text-white tracking-tighter italic">Go-Minahasa<span
                         class="text-orange-500">.</span></h1>
             </div>
 
-            <nav class="flex-1 px-4 space-y-2">
-                {{-- Menu Dashboard --}}
-                <a href="{{ route('admin.dashboard') }}"
-                    class="flex items-center px-4 py-3 transition-all rounded-xl {{ request()->routeIs('admin.dashboard') ? 'bg-slate-800 text-white border-r-4 border-orange-500 shadow-lg shadow-black/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
-                    <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.dashboard') ? 'text-orange-500' : 'text-slate-500' }}"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                        </path>
-                    </svg>
-                    <span class="font-medium text-sm">Dashboard</span>
-                </a>
+            <nav class="flex-1 px-4 flex flex-col gap-8 overflow-y-auto custom-scrollbar">
 
-                {{-- Menu Destinasi --}}
-                <a href="{{ route('admin.destinations.index') }}"
-                    class="flex items-center px-4 py-3 transition-all rounded-xl {{ request()->routeIs('admin.destinations.*') ? 'bg-slate-800 text-white border-r-4 border-orange-500 shadow-lg shadow-black/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
-                    <svg class="w-5 h-5 mr-3 {{ request()->routeIs('admin.destinations.*') ? 'text-orange-500' : 'text-slate-500' }}"
-                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    <span class="font-medium text-sm">Destinasi</span>
-                </a>
+                <div>
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 ml-4">Main</p>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="{{ route('admin.dashboard') }}"
+                                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all {{ request()->routeIs('admin.dashboard') ? 'bg-orange-600/10 text-orange-500 font-bold border border-orange-500/20 shadow-lg shadow-orange-900/10' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                <i class="fa-solid fa-house-chimney w-5 text-sm"></i>
+                                <span class="text-sm">Dashboard</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
 
-                {{-- MENU KHUSUS ADMIN (Felix) --}}
-                @if(Auth::user() && Auth::user()->role === 'admin')
-                    <div class="pt-4 pb-2">
-                        <p class="px-4 text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em]">Management</p>
+                <div>
+                    <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 ml-4">Wisata &
+                        Konten</p>
+                    <ul class="space-y-2">
+                        <li>
+                            <a href="{{ route('admin.destinations.index') }}"
+                                class="group flex items-center gap-3 px-4 py-3 rounded-2xl transition-all {{ request()->routeIs('admin.destinations.*') ? 'bg-orange-600/10 text-orange-500 font-bold border border-orange-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                <i
+                                    class="fa-solid fa-map-location-dot w-5 text-sm {{ request()->routeIs('admin.destinations.*') ? 'text-orange-500' : 'group-hover:text-orange-500' }}"></i>
+                                <span class="text-sm">Destinasi</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.categories.index') }}"
+                                class="group flex items-center gap-3 px-4 py-3 rounded-2xl transition-all {{ request()->routeIs('admin.categories.*') ? 'bg-orange-600/10 text-orange-500 font-bold border border-orange-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                <i
+                                    class="fa-solid fa-tags w-5 text-sm {{ request()->routeIs('admin.categories.*') ? 'text-orange-500' : 'group-hover:text-orange-500' }}"></i>
+                                <span class="text-sm">Kategori Wisata</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.posts.index') }}"
+                                class="group flex items-center gap-3 px-4 py-3 rounded-2xl transition-all {{ request()->routeIs('admin.posts.*') ? 'bg-orange-600/10 text-orange-500 font-bold border border-orange-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                <i
+                                    class="fa-solid fa-newspaper w-5 text-sm {{ request()->routeIs('admin.posts.*') ? 'text-orange-500' : 'group-hover:text-orange-500' }}"></i>
+                                <span class="text-sm">Blog / Artikel</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="{{ route('admin.galleries.index') }}"
+                                class="group flex items-center gap-3 px-4 py-3 rounded-2xl transition-all {{ request()->routeIs('admin.galleries.*') ? 'bg-orange-600/10 text-orange-500 font-bold border border-orange-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                <i
+                                    class="fa-solid fa-images w-5 text-sm {{ request()->routeIs('admin.galleries.*') ? 'text-orange-500' : 'group-hover:text-orange-500' }}"></i>
+                                <span class="text-sm">Galeri Wisata</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                @if(auth()->user()->role == 'admin')
+                    <div>
+                        <p class="text-[10px] font-black text-slate-500 uppercase tracking-[0.2em] mb-4 ml-4">Management</p>
+                        <ul class="space-y-2">
+                            <li>
+                                <a href="{{ route('admin.testimonials.index') }}"
+                                    class="group flex items-center gap-3 px-4 py-3 rounded-2xl transition-all {{ request()->routeIs('admin.testimonials.*') ? 'bg-orange-600/10 text-orange-500 font-bold border border-orange-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                    <i
+                                        class="fa-solid fa-comment-dots w-5 text-sm {{ request()->routeIs('admin.testimonials.*') ? 'text-orange-500' : 'group-hover:text-orange-500' }}"></i>
+                                    <span class="text-sm">Testimonial</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ route('admin.users.index') }}"
+                                    class="group flex items-center gap-3 px-4 py-3 rounded-2xl transition-all {{ request()->routeIs('admin.users.*') ? 'bg-orange-600/10 text-orange-500 font-bold border border-orange-500/20' : 'text-slate-400 hover:bg-slate-800 hover:text-white' }}">
+                                    <i
+                                        class="fa-solid fa-users-gear w-5 text-sm {{ request()->routeIs('admin.users.*') ? 'text-orange-500' : 'group-hover:text-orange-500' }}"></i>
+                                    <span class="text-sm">Kelola Staff</span>
+                                </a>
+                            </li>
+                        </ul>
                     </div>
-                    <a href="{{ route('admin.users.index') }}"
-                        class="flex items-center px-4 py-3 transition-all rounded-xl {{ request()->routeIs('admin.users.*') ? 'bg-slate-800 text-white border-r-4 border-orange-500 shadow-lg shadow-black/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50' }}">
-                        <i
-                            class="fa-solid fa-users-gear w-5 mr-3 text-sm {{ request()->routeIs('admin.users.*') ? 'text-orange-500' : 'text-slate-500' }}"></i>
-                        <span class="font-medium text-sm">Kelola Staff</span>
-                    </a>
                 @endif
             </nav>
 
             {{-- Bagian Logout --}}
-            <div class="p-4 border-t border-slate-800">
+            <div class="p-6 border-t border-slate-800/50">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit"
-                        class="w-full flex items-center px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-xl transition-all font-bold group">
-                        <svg class="w-5 h-5 mr-3 transition-transform group-hover:-translate-x-1" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
-                            </path>
-                        </svg>
-                        Logout
+                        class="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-500/10 rounded-2xl transition-all font-bold group">
+                        <i class="fa-solid fa-right-from-bracket transition-transform group-hover:-translate-x-1"></i>
+                        <span class="text-sm">Logout System</span>
                     </button>
                 </form>
             </div>
@@ -88,9 +121,8 @@
                     <div class="text-right">
                         <p class="text-sm font-black text-slate-800 leading-none">{{ Auth::user()->name ?? 'Admin' }}
                         </p>
-                        {{-- Label Role Dinamis --}}
                         <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">
-                            {{ Auth::user()->role === 'admin' ? 'Administrator' : 'Staff Editor' }}
+                            {{ auth()->user()->role == 'admin' ? 'Administrator' : 'Staff Editor' }}
                         </p>
                     </div>
                     <div
@@ -117,9 +149,7 @@
                 text: "{{ session('success') }}",
                 showConfirmButton: false,
                 timer: 2000,
-                customClass: {
-                    popup: 'rounded-[2rem]'
-                }
+                customClass: { popup: 'rounded-[2rem]' }
             });
         @endif
     </script>

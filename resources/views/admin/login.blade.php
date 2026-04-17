@@ -6,6 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Admin - Go-Minahasa Panel</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    {{-- Tambahkan script Alpine.js di sini --}}
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         .bg-pattern {
@@ -14,6 +16,10 @@
             background-size: 20px 20px;
             background-position: 0 0, 10px 10px;
             opacity: 0.05;
+        }
+
+        [x-cloak] {
+            display: none !important;
         }
     </style>
 </head>
@@ -56,13 +62,14 @@
                             class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-orange-500 transition-colors">
                             <i class="fa-solid fa-envelope"></i>
                         </span>
-                        <input type="email" name="email" required
+                        <input type="email" name="email" value="{{ old('email') }}" required
                             class="w-full pl-12 pr-4 py-4 bg-slate-100 border-transparent border-2 focus:border-orange-500 focus:bg-white rounded-2xl outline-none transition-all text-sm font-medium"
                             placeholder="admin@example.com">
                     </div>
                 </div>
 
-                <div>
+                {{-- Input Password dengan Fitur Show/Hide --}}
+                <div x-data="{ show: false }">
                     <label
                         class="block text-xs font-black text-slate-700 uppercase tracking-widest mb-2 ml-1">Password</label>
                     <div class="relative group">
@@ -70,9 +77,15 @@
                             class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400 group-focus-within:text-orange-500 transition-colors">
                             <i class="fa-solid fa-lock"></i>
                         </span>
-                        <input type="password" name="password" required
-                            class="w-full pl-12 pr-4 py-4 bg-slate-100 border-transparent border-2 focus:border-orange-500 focus:bg-white rounded-2xl outline-none transition-all text-sm font-medium"
+                        <input :type="show ? 'text' : 'password'" name="password" required
+                            class="w-full pl-12 pr-12 py-4 bg-slate-100 border-transparent border-2 focus:border-orange-500 focus:bg-white rounded-2xl outline-none transition-all text-sm font-medium"
                             placeholder="••••••••">
+
+                        {{-- Tombol Mata --}}
+                        <button type="button" @click="show = !show"
+                            class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-orange-500 transition-colors">
+                            <i class="fa-solid" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
                     </div>
                 </div>
 

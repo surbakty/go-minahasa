@@ -1,8 +1,11 @@
 @extends('layouts.visitor')
 
-@section('title', 'Go Minahasa - Luxury Travel Experience')
+@section('title', 'Go Minahasa')
 
 @push('styles')
+    {{-- Swiper CSS --}}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
     <style>
         @keyframes float {
 
@@ -37,224 +40,275 @@
             border: 1px solid rgba(226, 232, 240, 0.8);
         }
 
-        .testimonial-card-light {
-            background: linear-gradient(145deg, #f8fafc, #ffffff);
+        /* Swiper Custom Pagination */
+        .swiper-pagination-bullet-active {
+            background: #f97316 !important;
+        }
+
+        .gallerySwiper .swiper-slide {
+            height: auto;
+        }
+
+        /* Hover effect for navigation arrows */
+        .group-swiper:hover .nav-btn {
+            opacity: 1;
         }
     </style>
 @endpush
 
 @section('content')
     {{-- Hero Section --}}
-    <header class="relative min-h-screen flex items-center overflow-hidden bg-slate-950">
-        <div class="absolute inset-0 opacity-30">
-            <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-600 rounded-full blur-[120px]"></div>
-            <div class="absolute bottom-[-10%] right-[-10%] w-[400px] h-[400px] bg-blue-600 rounded-full blur-[120px]">
+    <header class="relative min-h-screen flex items-center justify-center overflow-hidden bg-slate-950">
+        {{-- Background Image dengan Animasi Slow Zoom --}}
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&q=80"
+                class="w-full h-full object-cover animate-slow-zoom" alt="Background Pantai Minahasa">
+
+            {{-- Overlay Gradasi --}}
+            <div class="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-slate-950/40 to-slate-950/80"></div>
+        </div>
+
+        {{-- Dekorasi Cahaya --}}
+        <div class="absolute inset-0 opacity-20 z-0">
+            <div class="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-600 rounded-full blur-[150px]"></div>
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10 text-center">
+            <div class="max-w-4xl mx-auto space-y-8" data-aos="zoom-in" data-aos-duration="1000">
+                <span
+                    class="inline-block px-4 py-2 rounded-full bg-orange-600/20 text-orange-400 border border-orange-500/30 text-xs font-black tracking-[0.2em] uppercase">
+                    Welcome to North Sulawesi
+                </span>
+
+                <h1 class="text-5xl lg:text-8xl font-black text-white leading-tight">
+                    Jelajahi Pesona <br>
+                    <span
+                        class="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 to-orange-300">Minahasa</span>
+                </h1>
+
+                <p class="text-gray-200 text-lg lg:text-xl max-w-2xl mx-auto leading-relaxed font-medium drop-shadow-md">
+                    Nikmati perjalanan tak terlupakan ke jantung Sulawesi Utara. Dari keajaiban bawah laut hingga hamparan
+                    pegunungan yang memukau, semua ada di sini.
+                </p>
+
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
+                    <a href="{{ route('destinations.index') }}"
+                        class="group relative px-7 py-3.5 bg-orange-600 hover:bg-orange-700 text-white rounded-xl font-bold uppercase text-xs tracking-widest transition-all shadow-md shadow-orange-900/10 active:scale-95">
+                        Mulai Petualangan
+                        <i class="fa-solid fa-arrow-right ml-2 group-hover:translate-x-1 transition-transform"></i>
+                    </a>
+                </div>
             </div>
         </div>
 
-        <div class="container mx-auto px-6 relative z-10">
-            <div class="grid lg:grid-cols-2 gap-12 items-center">
-                <div class="space-y-8 text-left">
-                    <span
-                        class="inline-block px-4 py-2 rounded-full bg-orange-600/10 text-orange-500 border border-orange-500/20 text-sm font-bold tracking-widest uppercase">
-                        Premium Experience
-                    </span>
-                    <h1 class="text-6xl lg:text-7xl font-black text-white leading-tight">
-                        Jelajahi <span class="text-gradient">Minahasa</span> <br>dengan Gaya.
-                    </h1>
-                    <p class="text-gray-400 text-xl max-w-lg leading-relaxed">
-                        Nikmati perjalanan eksklusif ke jantung Sulawesi Utara. Dari puncak gunung berapi hingga kedalaman
-                        laut yang tenang.
-                    </p>
-                    <div class="flex flex-wrap gap-4">
-                        <a href="#explore"
-                            class="px-8 py-4 bg-orange-600 hover:bg-orange-700 text-white rounded-2xl font-bold transition-all transform hover:scale-105 hover:shadow-[0_0_30px_rgba(234,88,12,0.4)]">
-                            Mulai Petualangan
-                        </a>
-                        <button class="px-8 py-4 glass text-white rounded-2xl font-bold hover:bg-white/10 transition-all">
-                            Lihat Video
-                        </button>
-                    </div>
-                </div>
-
-                <div class="hidden lg:block relative">
-                    <div
-                        class="floating w-full h-[500px] rounded-[3rem] overflow-hidden shadow-2xl border-4 border-white/10">
-                        <img src="https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&q=80"
-                            class="w-full h-full object-cover shadow-inner" alt="Minahasa View">
-                        <div class="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent"></div>
-                    </div>
-                </div>
-            </div>
+        <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce text-white/30">
+            <i class="fa-solid fa-chevron-down text-2xl"></i>
         </div>
     </header>
 
-    {{-- Section Fitur --}}
-    <section class="py-24 bg-slate-50">
+    <style>
+        /* Keyframe untuk efek Zoom-In & Zoom-Out halus */
+        @keyframes slowZoom {
+            0% {
+                transform: scale(1);
+            }
+
+            100% {
+                transform: scale(1.1);
+            }
+        }
+
+        .animate-slow-zoom {
+            animation: slowZoom 15s ease-in-out infinite alternate;
+        }
+    </style>
+
+    {{-- Section Destinasi Terpilih - Versi Lebih Compact --}}
+    <section id="explore" class="py-16 bg-white"> {{-- py-24 dikurangi ke py-16 agar lebih slim --}}
         <div class="container mx-auto px-6">
-            <div class="grid md:grid-cols-3 gap-8 text-center">
-                <div class="feature-card p-10 rounded-[2.5rem] space-y-6 group hover:shadow-xl transition-all duration-500">
-                    <div
-                        class="w-20 h-20 bg-orange-100 text-orange-600 rounded-3xl flex items-center justify-center mx-auto group-hover:bg-orange-600 group-hover:text-white transition-all duration-500 shadow-inner">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z">
-                            </path>
-                        </svg>
+            <div class="text-center mb-12 space-y-3" data-aos="fade-down" data-aos-duration="700">
+                <h2 class="text-3xl font-black text-slate-900">Destinasi <span class="text-orange-600">Terpilih</span></h2>
+                <div class="w-20 h-1 bg-orange-600 mx-auto rounded-full"></div>
+                <p class="text-gray-500 text-sm max-md mx-auto">Kurasi tempat wisata terbaik khusus untuk Anda.</p>
+            </div>
+
+            {{-- Grid tetap 3 kolom, namun max-w kontainer diperkecil --}}
+            <div class="max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 justify-items-center">
+                @forelse($destinations->take(3) as $destination)
+                    {{-- max-w dikurangi ke 300px dan tinggi ke 400px --}}
+                    <div class="group relative w-full max-w-[300px] h-[400px] rounded-[2.5rem] overflow-hidden shadow-xl transition-all duration-700 hover:-translate-y-3"
+                        data-aos="zoom-in" data-aos-delay="{{ $loop->index * 100 }}" data-aos-duration="700">
+
+                        <img src="{{ $destination->cover_image ? asset('storage/' . $destination->cover_image) : 'https://images.unsplash.com/photo-1518548419970-58e3b4079ca1?auto=format&fit=crop&q=80' }}"
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
+                            alt="{{ $destination->name }}">
+
+                        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/20 to-transparent"></div>
+
+                        <div class="absolute bottom-6 left-6 right-6 text-white">
+                            {{-- Ukuran font judul dikurangi ke text-xl --}}
+                            <h3 class="text-xl font-black mb-4 leading-tight">{{ $destination->name }}</h3>
+
+                            <div class="flex items-center justify-between gap-2">
+                                {{-- Padding tombol diperkecil --}}
+                                <a href="{{ route('destinations.show', $destination->slug) }}"
+                                    class="px-4 py-2 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-[10px] font-bold hover:bg-orange-600 hover:border-orange-600 transition-all duration-300">
+                                    Lihat Detail
+                                </a>
+                                <p class="font-bold text-sm whitespace-nowrap">
+                                    {{ $destination->price > 0 ? 'Rp ' . number_format($destination->price, 0, ',', '.') : 'Gratis' }}
+                                </p>
+                            </div>
+                        </div>
                     </div>
-                    <h3 class="text-2xl font-bold text-slate-900">Hidden Gems</h3>
-                    <p class="text-gray-500 leading-relaxed">Akses eksklusif ke sudut tersembunyi Minahasa yang jarang
-                        terjamah publik.</p>
-                </div>
-                <div
-                    class="feature-card p-10 rounded-[2.5rem] space-y-6 group hover:shadow-xl transition-all duration-500 border-orange-200">
-                    <div
-                        class="w-20 h-20 bg-blue-100 text-blue-600 rounded-3xl flex items-center justify-center mx-auto group-hover:bg-blue-600 group-hover:text-white transition-all duration-500 shadow-inner">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-900">Layanan Personal</h3>
-                    <p class="text-gray-500 leading-relaxed">Setiap detail perjalanan Anda disusun secara personal oleh tim
-                        ahli kami.</p>
-                </div>
-                <div class="feature-card p-10 rounded-[2.5rem] space-y-6 group hover:shadow-xl transition-all duration-500">
-                    <div
-                        class="w-20 h-20 bg-green-100 text-green-600 rounded-3xl flex items-center justify-center mx-auto group-hover:bg-green-600 group-hover:text-white transition-all duration-500 shadow-inner">
-                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z">
-                            </path>
-                        </svg>
-                    </div>
-                    <h3 class="text-2xl font-bold text-slate-900">Keamanan Terjamin</h3>
-                    <p class="text-gray-500 leading-relaxed">Kenyamanan dan keselamatan Anda adalah prioritas utama kami.
-                    </p>
-                </div>
+                @empty
+                    <p class="text-gray-400 col-span-3 text-center">Belum ada destinasi yang tersedia.</p>
+                @endforelse
             </div>
         </div>
     </section>
 
-    {{-- Section Destinasi Terpilih --}}
-    <section id="explore" class="py-24 bg-white">
+    {{-- Section Gallery (Carousel Version) - Versi Slim & Center --}}
+    <section class="py-12 bg-white overflow-hidden">
         <div class="container mx-auto px-6">
-            <div class="text-center mb-16 space-y-4">
-                <h2 class="text-4xl font-black text-slate-900">Destinasi <span class="text-orange-600">Terpilih</span></h2>
-                <div class="w-24 h-1 bg-orange-600 mx-auto rounded-full"></div>
-                <p class="text-gray-500 max-w-md mx-auto">Kurasi tempat wisata terbaik khusus untuk kenyamanan Anda.</p>
+            {{-- Header Galeri: Judul di Tengah --}}
+            <div class="text-center mb-8" data-aos="fade-up" data-aos-duration="700">
+                <h2 class="text-3xl font-black text-slate-900">Sudut <span class="text-orange-600">Minahasa</span></h2>
+                <div class="w-16 h-1 bg-orange-600 mt-2 mx-auto rounded-full"></div>
+                <p class="text-gray-500 mt-3 text-sm max-w-lg mx-auto">Momen autentik dari berbagai sudut tanah Minahasa.
+                </p>
             </div>
 
-            <div class="max-w-6xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 justify-items-center">
-                    @php
-                        // Jika database masih kosong, kita buat dummy 3 data untuk preview
-                        $displayItems = count($destinations) > 0 ? $destinations->take(3) : range(1, 3);
-                    @endphp
-
-                    @foreach($displayItems as $index)
-                        <div
-                            class="group relative w-full max-w-[350px] h-[480px] rounded-[3rem] overflow-hidden shadow-2xl transition-all duration-700 hover:-translate-y-4">
-                            <img src="https://images.unsplash.com/photo-1518548419970-58e3b4079ca1?auto=format&fit=crop&q=80"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000"
-                                alt="Destinasi">
-
-                            <div class="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent"></div>
-
-                            <div class="absolute bottom-8 left-8 right-8 text-white">
-                                <p class="text-orange-500 font-bold text-[10px] tracking-widest uppercase mb-2">Terpopuler</p>
-                                <h3 class="text-2xl font-black mb-6 leading-tight">Taman Laut Bunaken</h3>
-
-                                <div class="flex items-center justify-between gap-2">
-                                    <a href="/destination/bunaken"
-                                        class="px-5 py-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-xs font-bold hover:bg-orange-600 hover:border-orange-600 transition-all duration-300">
-                                        Lihat Detail
-                                    </a>
-                                    <p class="font-bold text-base whitespace-nowrap">Rp 250.000</p>
+            <div class="relative group-swiper">
+                {{-- Swiper Container: Aspect Square (1:1) agar card lebih kecil --}}
+                <div class="swiper gallerySwiper px-4" data-aos="fade-up" data-aos-delay="200" data-aos-duration="700">
+                    <div class="swiper-wrapper">
+                        @foreach($galleries as $gallery)
+                            <div class="swiper-slide py-2">
+                                <div
+                                    class="group relative overflow-hidden rounded-[2rem] aspect-square bg-slate-100 shadow-sm transition-all duration-500 hover:shadow-xl hover:-translate-y-1">
+                                    <img src="{{ asset('storage/' . $gallery->image) }}" alt="{{ $gallery->title }}"
+                                        class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
+                                    <div
+                                        class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-end p-6">
+                                        <p class="text-white font-bold text-sm leading-tight">
+                                            {{ $gallery->title }}
+                                        </p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    @endforeach
+                        @endforeach
+                    </div>
                 </div>
+
+                {{-- Navigasi: Floating di sisi slider --}}
+                <button
+                    class="gallery-prev nav-btn absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-slate-400 hover:text-orange-600 transition-all opacity-0 md:opacity-0">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                <button
+                    class="gallery-next nav-btn absolute right-0 top-1/2 -translate-y-1/2 translate-x-2 z-10 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center text-slate-400 hover:text-orange-600 transition-all opacity-0 md:opacity-0">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
             </div>
         </div>
     </section>
 
     {{-- Section Testimonial --}}
-    <section class="py-24 bg-slate-50 overflow-hidden relative">
-        <div class="absolute top-0 right-0 w-96 h-96 bg-blue-50 rounded-full blur-[100px] -z-0"></div>
-        <div class="container mx-auto px-6 text-center relative z-10">
-            <h2 class="text-4xl font-black text-slate-900 mb-16">Kisah Mereka, <span class="text-orange-600">Perjalanan
-                    Anda.</span></h2>
-            <div class="max-w-6xl mx-auto">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div class="testimonial-card-light p-8 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
-                        <div class="flex justify-center text-yellow-400 text-sm">★★★★★</div>
-                        <p class="text-slate-600 italic leading-relaxed text-lg">"Pengalaman eksklusif. Saya tidak menyangka
-                            ada surga seperti ini di Minahasa."</p>
-                        <div class="flex items-center justify-center gap-4 pt-6 border-t border-slate-100">
-                            <div class="w-12 h-12 rounded-full border-2 border-orange-500 p-0.5"><img
-                                    class="w-full h-full rounded-full object-cover" src="https://i.pravatar.cc/150?u=1">
-                            </div>
-                            <div class="text-left">
-                                <h4 class="font-bold text-slate-900">Andini Putri</h4>
-                                <p class="text-xs text-gray-400">Travel Enthusiast</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        class="p-8 rounded-[2.5rem] bg-slate-900 shadow-2xl space-y-6 transform md:scale-110 z-20 border border-slate-800">
-                        <div class="flex justify-center text-orange-500 text-sm">★★★★★</div>
-                        <p class="text-slate-200 italic leading-relaxed text-lg">"Tim Go Minahasa tahu persis waktu terbaik
-                            untuk sampai ke lokasi tanpa keramaian."</p>
-                        <div class="flex items-center justify-center gap-4 pt-6 border-t border-slate-700">
-                            <div class="w-12 h-12 rounded-full border-2 border-orange-500 p-0.5"><img
-                                    class="w-full h-full rounded-full object-cover" src="https://i.pravatar.cc/150?u=2">
-                            </div>
-                            <div class="text-left">
-                                <h4 class="font-bold text-white">Budi Santoso</h4>
-                                <p class="text-xs text-slate-400">Photographer</p>
+    <section class="py-24 bg-slate-50 overflow-hidden">
+        <div class="container mx-auto px-6">
+            <div class="text-center mb-16" data-aos="fade-down" data-aos-duration="700">
+                <h2 class="text-4xl font-black text-slate-900">Kisah <span class="text-orange-600">Pengunjung</span></h2>
+                <p class="text-gray-500 mt-4">Apa kata mereka tentang pengalaman bersama Go Minahasa.</p>
+            </div>
+
+            <div class="swiper testimonialSwiper pb-12">
+                <div class="swiper-wrapper">
+                    @foreach($testimonials as $t)
+                        <div class="swiper-slide h-auto">
+                            <div
+                                class="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 h-full flex flex-col transition-all hover:shadow-xl">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <img src="{{ $t->photo ? asset('storage/' . $t->photo) : 'https://ui-avatars.com/api/?name=' . urlencode($t->name) }}"
+                                        class="w-14 h-14 rounded-full object-cover border-2 border-orange-500 p-0.5"
+                                        alt="{{ $t->name }}">
+                                    <div>
+                                        <h4 class="font-bold text-slate-800">{{ $t->name }}</h4>
+                                        <p class="text-sm text-slate-500">{{ $t->profession ?? 'Traveler' }}</p>
+                                    </div>
+                                </div>
+                                <div class="flex text-orange-400 mb-4 gap-1">
+                                    @for($i = 0; $i < $t->rating; $i++)
+                                        <i class="fas fa-star text-[10px]"></i>
+                                    @endfor
+                                </div>
+                                <p class="text-slate-600 leading-relaxed italic text-sm flex-grow">
+                                    "{{ $t->content }}"
+                                </p>
                             </div>
                         </div>
-                    </div>
-                    <div class="testimonial-card-light p-8 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6">
-                        <div class="flex justify-center text-yellow-400 text-sm">★★★★★</div>
-                        <p class="text-slate-600 italic leading-relaxed text-lg">"Sangat recommended untuk keluarga.
-                            Anak-anak sangat menikmati edukasi budayanya."</p>
-                        <div class="flex items-center justify-center gap-4 pt-6 border-t border-slate-100">
-                            <div class="w-12 h-12 rounded-full border-2 border-orange-500 p-0.5"><img
-                                    class="w-full h-full rounded-full object-cover" src="https://i.pravatar.cc/150?u=3">
-                            </div>
-                            <div class="text-left">
-                                <h4 class="font-bold text-slate-900">Jessica Wijaya</h4>
-                                <p class="text-xs text-gray-400">Family Traveler</p>
-                            </div>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
+                <div class="swiper-pagination !bottom-0"></div>
             </div>
         </div>
     </section>
 
-    {{-- Section CTA --}}
-    <section class="py-20 bg-slate-50">
+    {{-- Section MAPS --}}
+    <section class="py-20 bg-white">
         <div class="container mx-auto px-6">
-            <div class="relative rounded-[4rem] overflow-hidden bg-slate-900 p-12 md:p-24 text-center shadow-2xl">
+            <div class="text-center mb-12" data-aos="fade-down" data-aos-duration="700">
+                <h2 class="text-4xl md:text-5xl font-black text-slate-900 mb-4">Eksplorasi Minahasa</h2>
+                <p class="text-slate-500 max-w-2xl mx-auto text-lg">Temukan lokasi destinasi impianmu di seluruh wilayah
+                    Kabupaten Minahasa.</p>
+            </div>
+
+            <div class="relative rounded-[4rem] overflow-hidden bg-slate-900 p-4 shadow-2xl" data-aos="zoom-in"
+                data-aos-duration="700">
                 <div class="absolute top-0 left-0 w-96 h-96 bg-orange-600/20 blur-[120px]"></div>
-                <div class="absolute bottom-0 right-0 w-96 h-96 bg-blue-600/10 blur-[120px]"></div>
-                <div class="relative z-10 space-y-8">
-                    <h2 class="text-4xl md:text-6xl font-black text-white">Siap Menulis Cerita Baru?</h2>
-                    <p class="text-slate-400 max-w-2xl mx-auto text-lg leading-relaxed">Bergabunglah dengan ratusan
-                        penjelajah yang telah menemukan keajaiban sejati bersama layanan eksklusif kami.</p>
-                    <div class="pt-6">
-                        <a href="#"
-                            class="px-12 py-5 bg-white text-slate-950 rounded-2xl font-black hover:bg-orange-500 hover:text-white transition-all shadow-xl inline-block transform hover:scale-105">
-                            Konsultasi Gratis Sekarang
-                        </a>
-                    </div>
+                <div class="z-10 w-full h-[500px] rounded-[3rem] overflow-hidden border border-white/10 relative">
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d255314.4132473347!2d124.71261314815197!3d1.1332824905183317!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x32873ec875c742c3%3A0x3030303030303030!2sMinahasa%20Regency%2C%20North%20Sulawesi!5e0!3m2!1sen!2sid!4v1713165000000!5m2!1sen!2sid"
+                        class="w-full h-full border-0" allowfullscreen="" loading="lazy"></iframe>
                 </div>
             </div>
         </div>
     </section>
 @endsection
+
+@push('scripts')
+    {{-- Swiper JS --}}
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Testimonial Swiper
+            new Swiper(".testimonialSwiper", {
+                slidesPerView: 1,
+                spaceBetween: 30,
+                loop: true,
+                autoplay: { delay: 5000, disableOnInteraction: false },
+                pagination: { el: ".swiper-pagination", clickable: true },
+                breakpoints: {
+                    640: { slidesPerView: 2 },
+                    1024: { slidesPerView: 3 },
+                },
+            });
+
+            // Gallery Swiper - Dibuat lebih padat (5 slide di desktop)
+            new Swiper(".gallerySwiper", {
+                slidesPerView: 2.2,
+                spaceBetween: 15,
+                loop: true,
+                grabCursor: true,
+                navigation: {
+                    nextEl: ".gallery-next",
+                    prevEl: ".gallery-prev",
+                },
+                breakpoints: {
+                    640: { slidesPerView: 3.2, spaceBetween: 20 },
+                    1024: { slidesPerView: 5.2, spaceBetween: 25 },
+                },
+            });
+        });
+    </script>
+@endpush

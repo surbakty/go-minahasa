@@ -11,12 +11,11 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
-        // DI SINI TEMPAT MENDAFTARKAN ALIAS
+        // Daftarkan alias 'role' menggunakan class CheckRole yang baru dibuat
         $middleware->alias([
-            'role' => \App\Http\Middleware\RoleMiddleware::class,
+            'role' => \App\Http\Middleware\CheckRole::class,
         ]);
-    }) // <-- Pastikan tutup kurung ini benar
+    })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })
-    ->create(); // <-- Titik koma HANYA ada di paling akhir setelah create()
+    })->create();

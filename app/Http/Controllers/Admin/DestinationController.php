@@ -4,65 +4,52 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller; 
 use App\Models\Destination;
+use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Storage;
 
 class DestinationController extends Controller
 {
-    /**
-     * Menampilkan daftar semua destinasi di dashboard admin.
-     */
     public function index()
     {
-        $destinations = Destination::latest()->get();
+        // Eager Loading 'category' untuk menghindari N+1 Query
+        $destinations = Destination::with('category')->latest()->get();
         return view('admin.destinations.index', compact('destinations'));
     }
 
-    /**
-     * Menampilkan form untuk menambah destinasi baru.
-     */
     public function create()
     {
-        return view('admin.destinations.create');
+        $categories = Category::all();
+        return view('admin.destinations.create', compact('categories'));
     }
 
-    /**
-     * Menyimpan data destinasi baru ke database.
-     */
     public function store(Request $request)
     {
-        // Validasi: cover_image wajib (required) saat tambah baru
         $request->validate([
             'name' => 'required|string|max:255',
             'location' => 'required|string',
-            'category' => 'required',
+            'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric',
             'description' => 'required',
-            'cover_image' => 'required|image|max:2048', // Semua format gambar diizinkan
-            'gallery.*' => 'image|max:2048', // Validasi tiap file di gallery
+            'cover_image' => 'required|image|max:2048',
+            'gallery.*' => 'image|max:2048',
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['cover_image', 'gallery']);
         $data['slug'] = Str::slug($request->name);
+        $data['facilities'] = $request->facilities ?? [];
 
-        // Upload Cover Image
         if ($request->hasFile('cover_image')) {
             $data['cover_image'] = $request->file('cover_image')->store('destinations/covers', 'public');
         }
 
-        // Handle Gallery (Array ke JSON)
         if ($request->hasFile('gallery')) {
             $galleryPaths = [];
             foreach ($request->file('gallery') as $file) {
                 $galleryPaths[] = $file->store('destinations/gallery', 'public');
             }
-            $data['gallery'] = json_encode($galleryPaths);
-        }
-
-        // Handle Facilities (Array ke JSON)
-        if ($request->has('facilities')) {
-            $data['facilities'] = json_encode($request->facilities);
+            $data['gallery'] = $galleryPaths; 
         }
 
         Destination::create($data);
@@ -71,61 +58,64 @@ class DestinationController extends Controller
     }
 
     /**
-     * Menampilkan form edit untuk destinasi tertentu.
+     * Menampilkan halaman edit dengan proteksi array pada facilities agar tidak TypeError
      */
-    public function edit(Destination $destination)
+    public function edit($id)
     {
-        $facilities = json_decode($destination->facilities, true) ?? [];
-        $gallery = json_decode($destination->gallery, true) ?? [];
+        $destination = Destination::findOrFail($id);
+        $categories = Category::all(); 
 
-        return view('admin.destinations.edit', compact('destination', 'facilities', 'gallery'));
+        // Paksa menjadi array agar in_array() di view tidak error
+        $currentFacilities = is_array($destination->facilities) 
+            ? $destination->facilities 
+            : (json_decode($destination->facilities, true) ?? []);
+
+        return view('admin.destinations.edit', compact('destination', 'categories', 'currentFacilities'));
     }
 
-    /**
-     * Memperbarui data destinasi di database.
-     */
     public function update(Request $request, Destination $destination)
     {
-        // Validasi: cover_image bersifat nullable saat update
         $request->validate([
             'name' => 'required|string|max:255',
             'location' => 'required|string',
-            'category' => 'required', // Tambahkan agar tidak hilang saat update
+            'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric',
             'description' => 'required',
-            'cover_image' => 'nullable|image|max:2048', // Opsional, jika mau ganti saja
-            'gallery.*' => 'image|max:2048',
+            'cover_image' => 'nullable|image|max:2048',
+            'gallery.*' => 'nullable|image|max:2048',
         ]);
 
-        $data = $request->all();
+        $data = $request->except(['cover_image', 'gallery']);
         $data['slug'] = Str::slug($request->name);
+        $data['facilities'] = $request->facilities ?? [];
 
-        // Update Cover Image jika ada file baru
         if ($request->hasFile('cover_image')) {
-            // Hapus foto lama jika ada
-            if ($destination->cover_image) {
+            if ($destination->cover_image && Storage::disk('public')->exists($destination->cover_image)) {
                 Storage::disk('public')->delete($destination->cover_image);
             }
             $data['cover_image'] = $request->file('cover_image')->store('destinations/covers', 'public');
         }
 
-        // Update Gallery (Logika sederhana: ganti semua jika ada upload baru)
         if ($request->hasFile('gallery')) {
-            // Hapus gallery lama dari storage
-            $oldGallery = json_decode($destination->gallery, true) ?? [];
-            foreach ($oldGallery as $oldFile) {
-                Storage::disk('public')->delete($oldFile);
+            // Gunakan proteksi array saat menghapus file fisik lama
+            $oldGalleries = is_array($destination->gallery) 
+                ? $destination->gallery 
+                : (json_decode($destination->gallery, true) ?? []);
+
+            if (!empty($oldGalleries)) {
+                foreach ($oldGalleries as $oldFile) {
+                    if (Storage::disk('public')->exists($oldFile)) {
+                        Storage::disk('public')->delete($oldFile);
+                    }
+                }
             }
 
             $galleryPaths = [];
             foreach ($request->file('gallery') as $file) {
                 $galleryPaths[] = $file->store('destinations/gallery', 'public');
             }
-            $data['gallery'] = json_encode($galleryPaths);
+            $data['gallery'] = $galleryPaths;
         }
-
-        // Update Facilities
-        $data['facilities'] = json_encode($request->facilities ?? []);
 
         $destination->update($data);
 
@@ -133,18 +123,26 @@ class DestinationController extends Controller
     }
 
     /**
-     * Menghapus destinasi dari database.
+     * Menghapus destinasi dengan proteksi array pada gallery
      */
     public function destroy(Destination $destination)
     {
-        if ($destination->cover_image) {
+        // Hapus Cover fisik
+        if ($destination->cover_image && Storage::disk('public')->exists($destination->cover_image)) {
             Storage::disk('public')->delete($destination->cover_image);
         }
 
-        // Hapus juga file gallery saat destinasi dihapus
-        $gallery = json_decode($destination->gallery, true) ?? [];
-        foreach ($gallery as $file) {
-            Storage::disk('public')->delete($file);
+        // PROTEKSI DELETE: Paksa gallery menjadi array sebelum di-foreach agar tidak ErrorException
+        $galleries = is_array($destination->gallery) 
+            ? $destination->gallery 
+            : (json_decode($destination->gallery, true) ?? []);
+
+        if (!empty($galleries)) {
+            foreach ($galleries as $file) {
+                if (Storage::disk('public')->exists($file)) {
+                    Storage::disk('public')->delete($file);
+                }
+            }
         }
 
         $destination->delete();

@@ -4,14 +4,15 @@
 
 @section('content')
     <div class="bg-white rounded-[2.5rem] border border-slate-100 shadow-sm overflow-hidden">
+        {{-- Header Tabel --}}
         <div class="p-8 border-b border-slate-50 flex justify-between items-center">
             <div>
                 <h3 class="font-bold text-xl text-slate-900">Daftar Wisata</h3>
-                <p class="text-sm text-slate-500">Total {{ $destinations->count() }} destinasi terdaftar</p>
+                <p class="text-sm text-slate-500 mt-1">Total {{ $destinations->count() }} destinasi terdaftar</p>
             </div>
             <a href="{{ route('admin.destinations.create') }}"
-                class="px-6 py-3 bg-orange-600 text-white rounded-2xl font-bold hover:bg-orange-700 transition-all shadow-lg shadow-orange-500/20">
-                + Tambah Destinasi
+                class="px-6 py-3 bg-orange-600 text-white rounded-2xl font-bold hover:bg-orange-700 transition-all shadow-lg shadow-orange-500/20 flex items-center">
+                <i class="fa-solid fa-plus mr-2"></i> Tambah Destinasi
             </a>
         </div>
 
@@ -30,21 +31,48 @@
                 </thead>
                 <tbody>
                     @forelse ($destinations as $destination)
-                        <tr class="border-b border-gray-50 hover:bg-gray-50 transition">
+                        <tr class="border-b border-gray-50 hover:bg-gray-50/50 transition group">
+                            {{-- Kolom Gambar --}}
                             <td class="py-4 px-8">
-                                <img src="{{ asset('storage/' . $destination->cover_image) }}" alt="{{ $destination->name }}"
-                                    class="w-16 h-12 object-cover rounded-lg shadow-sm">
+                                @if($destination->cover_image)
+                                    <img src="{{ asset('storage/' . $destination->cover_image) }}" alt="{{ $destination->name }}"
+                                        class="w-16 h-12 object-cover rounded-lg shadow-sm group-hover:scale-105 transition-transform">
+                                @else
+                                    <div class="w-16 h-12 bg-slate-100 rounded-lg flex items-center justify-center text-slate-400">
+                                        <i class="fa-solid fa-image"></i>
+                                    </div>
+                                @endif
                             </td>
+
+                            {{-- Nama Destinasi --}}
                             <td class="py-4 px-8">
-                                <span class="font-semibold text-gray-800">{{ $destination->name }}</span>
+                                <span class="font-bold text-slate-800 block">{{ $destination->name }}</span>
+                                <span class="text-[10px] text-slate-400 font-mono">{{ $destination->slug }}</span>
                             </td>
-                            <td class="py-4 px-8 text-sm text-gray-600">
-                                {{ $destination->category }}
+
+                            {{-- Kolom Kategori (PERBAIKAN DISINI) --}}
+                            <td class="py-4 px-8">
+                                <span
+                                    class="px-3 py-1 bg-orange-50 text-orange-600 rounded-full text-xs font-bold border border-orange-100 inline-block">
+                                    {{-- Cek apakah relasi category ada dan memiliki properti name --}}
+                                    @if(isset($destination->category->name))
+                                        {{ $destination->category->name }}
+                                    @elseif(is_string($destination->category))
+                                        {{-- Fallback jika data masih berupa string lama di database --}}
+                                        {{ $destination->category }}
+                                    @else
+                                        <span class="text-slate-400 italic font-normal">Tanpa Kategori</span>
+                                    @endif
+                                </span>
                             </td>
-                            <td class="py-4 px-8 text-sm text-gray-600 italic">
+
+                            {{-- Lokasi --}}
+                            <td class="py-4 px-8 text-sm text-slate-500 font-medium">
+                                <i class="fa-solid fa-location-dot mr-1 text-orange-500/50"></i>
                                 {{ $destination->location ?? 'Lokasi belum diatur' }}
                             </td>
 
+                            {{-- Harga --}}
                             <td class="py-4 px-8 font-medium">
                                 @if($destination->price == 0)
                                     <span
@@ -52,32 +80,27 @@
                                         Gratis
                                     </span>
                                 @else
-                                    <span class="text-orange-600 font-bold">
-                                        Rp {{ number_format($destination->price, 0, ',', '.') }}
+                                    <span class="text-slate-900 font-bold">
+                                        <span
+                                            class="text-xs text-slate-400 mr-0.5">Rp</span>{{ number_format($destination->price, 0, ',', '.') }}
                                     </span>
                                 @endif
                             </td>
 
+                            {{-- Tombol Aksi --}}
                             <td class="py-4 px-8">
                                 <div class="flex justify-center items-center gap-2">
                                     <a href="{{ route('admin.destinations.edit', $destination->id) }}"
-                                        class="w-10 h-10 flex items-center justify-center bg-blue-50 text-blue-600 rounded-full hover:bg-blue-100 transition-all border border-blue-100 shadow-sm"
+                                        class="w-10 h-10 flex items-center justify-center bg-blue-50 text-blue-600 rounded-xl hover:bg-blue-600 hover:text-white transition-all border border-blue-100 shadow-sm"
                                         title="Edit Destinasi">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z">
-                                            </path>
-                                        </svg>
+                                        <i class="fa-solid fa-pen-to-square text-sm"></i>
                                     </a>
 
-                                    <button type="button" onclick="confirmDelete({{ $destination->id }})"
-                                        class="w-10 h-10 flex items-center justify-center bg-red-50 text-red-600 rounded-full hover:bg-red-100 transition-all border border-red-100 shadow-sm"
+                                    <button type="button"
+                                        onclick="confirmDelete({{ $destination->id }}, '{{ $destination->name }}')"
+                                        class="w-10 h-10 flex items-center justify-center bg-red-50 text-red-600 rounded-xl hover:bg-red-600 hover:text-white transition-all border border-red-100 shadow-sm"
                                         title="Hapus Destinasi">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16">
-                                            </path>
-                                        </svg>
+                                        <i class="fa-solid fa-trash text-sm"></i>
                                     </button>
 
                                     <form id="delete-form-{{ $destination->id }}"
@@ -91,8 +114,13 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="py-20 text-center text-slate-400">
-                                <p class="italic text-lg">Belum ada data destinasi.</p>
+                            <td colspan="6" class="py-20 text-center">
+                                <div class="flex flex-col items-center">
+                                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mb-4">
+                                        <i class="fa-solid fa-map-location-dot text-4xl text-slate-200"></i>
+                                    </div>
+                                    <p class="text-slate-400 font-medium italic">Belum ada data destinasi yang terdaftar.</p>
+                                </div>
                             </td>
                         </tr>
                     @endforelse
@@ -100,25 +128,30 @@
             </table>
         </div>
     </div>
-@endsection
 
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script>
-    function confirmDelete(id) {
-        Swal.fire({
-            title: 'Apakah anda yakin?',
-            text: "Data destinasi ini akan dihapus secara permanen!",
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ea580c',
-            cancelButtonColor: '#64748b',
-            confirmButtonText: 'Ya, Hapus!',
-            cancelButtonText: 'Batal',
-            borderRadius: '20px'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                document.getElementById('delete-form-' + id).submit();
-            }
-        })
-    }
-</script>
+    {{-- Script Konfirmasi Hapus (SweetAlert2) --}}
+    <script>
+        function confirmDelete(id, name) {
+            Swal.fire({
+                title: 'Hapus Destinasi?',
+                text: "Destinasi '" + name + "' akan dihapus permanen dari sistem!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#ea580c', // Orange-600
+                cancelButtonColor: '#64748b',  // Slate-500
+                confirmButtonText: 'Ya, Hapus Sekarang!',
+                cancelButtonText: 'Batal',
+                reverseButtons: true,
+                customClass: {
+                    popup: 'rounded-[2.5rem] p-8',
+                    confirmButton: 'rounded-2xl px-6 py-3 font-bold',
+                    cancelButton: 'rounded-2xl px-6 py-3 font-bold'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    document.getElementById('delete-form-' + id).submit();
+                }
+            })
+        }
+    </script>
+@endsection

@@ -8,42 +8,56 @@
                 <p class="text-gray-500 text-sm">Update informasi untuk **{{ $destination->name }}**</p>
             </div>
             <a href="{{ route('admin.destinations.index') }}"
-                class="text-gray-600 hover:text-gray-800 flex items-center gap-2 transition">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd"
-                        d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                        clip-rule="evenodd" />
-                </svg>
-                Kembali
+                class="text-gray-600 hover:text-gray-800 flex items-center gap-2 transition font-medium">
+                <i class="fa-solid fa-arrow-left"></i> Kembali
             </a>
         </div>
 
-        {{-- Form sudah ditambahkan enctype agar bisa kirim file --}}
+        {{-- Menampilkan Pesan Error Validasi --}}
+        @if ($errors->any())
+            <div class="mb-6 p-4 bg-red-50 border-l-4 border-red-500 text-red-700 rounded-2xl shadow-sm">
+                <div class="flex items-center mb-2">
+                    <i class="fa-solid fa-circle-exclamation mr-2"></i>
+                    <span class="font-bold">Opps! Ada kendala:</span>
+                </div>
+                <ul class="list-disc list-inside text-sm opacity-90">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
+
         <form action="{{ route('admin.destinations.update', $destination->id) }}" method="POST"
-            enctype="multipart/form-data" class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+            enctype="multipart/form-data" class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
             @csrf
             @method('PUT')
 
-            <div class="p-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="p-8 md:p-10">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
 
                     {{-- KOLOM KIRI --}}
                     <div class="space-y-6">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Nama Destinasi</label>
                             <input type="text" name="name" value="{{ old('name', $destination->name) }}"
-                                class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-orange-500"
+                                class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-orange-500 transition-all"
                                 required>
                         </div>
 
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-semibold text-gray-700 mb-2">Kategori</label>
-                                <select name="category"
-                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-orange-500">
-                                    <option value="Wisata Alam" {{ $destination->category == 'Wisata Alam' ? 'selected' : '' }}>Wisata Alam</option>
-                                    <option value="Wisata Budaya" {{ $destination->category == 'Wisata Budaya' ? 'selected' : '' }}>Wisata Budaya</option>
-                                    <option value="Wisata Buatan" {{ $destination->category == 'Wisata Buatan' ? 'selected' : '' }}>Wisata Buatan</option>
+                                {{-- PERBAIKAN: name="category_id" dan looping dari data $categories --}}
+                                <select name="category_id"
+                                    class="w-full px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-orange-500 bg-white" required>
+                                    <option value="">-- Pilih Kategori --</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" 
+                                            {{ old('category_id', $destination->category_id) == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div>
@@ -63,33 +77,28 @@
 
                         {{-- Update Foto Sampul --}}
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Foto Sampul (Biarkan kosong jika
-                                tidak ganti)</label>
-                            <div
-                                class="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-orange-400 transition">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Foto Sampul (Opsional)</label>
+                            <div class="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:border-orange-400 transition-all bg-gray-50/50">
                                 <input type="file" name="cover_image"
                                     class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
                             </div>
                             @if($destination->cover_image)
-                                <div class="mt-2 flex items-center gap-2">
-                                    <span class="text-xs text-gray-400 italic">File saat ini:</span>
-                                    <img src="{{ Storage::url($destination->cover_image) }}"
-                                        class="h-10 w-10 object-cover rounded-md border" alt="Current Cover">
+                                <div class="mt-3 flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                                    <img src="{{ asset('storage/' . $destination->cover_image) }}"
+                                        class="h-12 w-12 object-cover rounded-lg shadow-sm" alt="Current Cover">
+                                    <span class="text-xs text-gray-500 font-medium italic">Gambar saat ini aktif</span>
                                 </div>
                             @endif
                         </div>
 
-                        {{-- Update Galeri (Multi-Upload) --}}
+                        {{-- Update Galeri --}}
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tambah Cuplikan Keindahan
-                                (Gallery)</label>
-                            <div
-                                class="border-2 border-dashed border-gray-200 rounded-xl p-4 text-center hover:border-orange-400 transition">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tambah Galeri (Multi-Upload)</label>
+                            <div class="border-2 border-dashed border-gray-200 rounded-2xl p-6 text-center hover:border-orange-400 transition-all bg-gray-50/50">
                                 <input type="file" name="gallery[]" multiple
                                     class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100">
                             </div>
-                            <p class="text-xs text-gray-500 mt-2 font-medium">*Mengunggah foto baru akan menambah koleksi
-                                foto yang sudah ada.</p>
+                            <p class="text-[10px] text-orange-500 mt-2 font-bold uppercase tracking-wider italic">* Mengunggah foto baru akan mengganti galeri lama.</p>
                         </div>
                     </div>
 
@@ -97,49 +106,48 @@
                     <div class="flex flex-col space-y-6">
                         <div class="flex flex-col flex-grow">
                             <label class="block text-sm font-semibold text-gray-700 mb-2">Deskripsi Lengkap</label>
-                            <textarea name="description" rows="8"
-                                class="w-full flex-grow px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-orange-500 resize-none">{{ old('description', $destination->description) }}</textarea>
+                            <textarea name="description" rows="10"
+                                class="w-full flex-grow px-4 py-3 rounded-xl border border-gray-200 outline-none focus:ring-2 focus:ring-orange-500 resize-none transition-all">{{ old('description', $destination->description) }}</textarea>
                         </div>
 
                         {{-- Fasilitas --}}
                         @php
-                            // Mengubah data facilities menjadi array agar bisa dicek oleh in_array
-                            $currentFacilities = is_array($destination->facilities) ? $destination->facilities : json_decode($destination->facilities, true) ?? [];
+                            $currentFacilities = $destination->facilities ?? [];
                         @endphp
 
                         <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-3">Fasilitas Tersedia</label>
-                            <div class="grid grid-cols-2 gap-y-3 gap-x-4 bg-gray-50 p-5 rounded-2xl border border-gray-100">
+                            <label class="block text-sm font-semibold text-gray-700 mb-3 text-center">Fasilitas Tersedia</label>
+                            <div class="grid grid-cols-2 gap-y-3 gap-x-4 bg-gray-50 p-6 rounded-[2rem] border border-gray-100">
                                 @foreach([
-                                        'wifi' => 'Free WiFi',
-                                        'pemandu' => 'Pemandu Wisata',
-                                        'akses24' => 'Akses 24 Jam',
-                                        'parkir' => 'Area Parkir',
-                                        'restoran' => 'Restoran',
-                                        'toilet' => 'Toilet Umum',
-                                        'ibadah' => 'Tempat Ibadah',
-                                        'penginapan' => 'Penginapan',
-                                        'spot_foto' => 'Spot Foto'
-                                    ] as $value => $label)
-                                        <label class="flex items-center gap-3 cursor-pointer group">
-                                            <input type="checkbox" name="facilities[]" value="{{ $value }}" 
-                                                    {{ in_array($value, $currentFacilities) ? 'checked' : '' }}
-                                                class="w-5 h-5 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
-                                            <span class="text-sm text-gray-600 group-hover:text-slate-900 transition-colors">{{ $label }}</span>
-                                        </label>
+                                    'wifi' => 'Free WiFi',
+                                    'pemandu' => 'Pemandu Wisata',
+                                    'akses24' => 'Akses 24 Jam',
+                                    'parkir' => 'Area Parkir',
+                                    'restoran' => 'Restoran',
+                                    'toilet' => 'Toilet Umum',
+                                    'ibadah' => 'Tempat Ibadah',
+                                    'penginapan' => 'Penginapan',
+                                    'spot_foto' => 'Spot Foto'
+                                ] as $value => $label)
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" name="facilities[]" value="{{ $value }}" 
+                                            {{ in_array($value, (array)($currentFacilities ?? [])) ? 'checked' : '' }}
+                                            class="w-5 h-5 rounded-lg border-gray-300 text-orange-600 focus:ring-orange-500 transition-all">
+                                        <span class="text-sm text-gray-600 group-hover:text-orange-600 transition-colors">{{ $label }}</span>
+                                    </label>
                                 @endforeach
                             </div>
                         </div>
                     </div>
                 </div>
-                </div>
+            </div>
 
-                <div class="bg-gray-50 px-8 py-5 flex justify-end gap-4 border-t border-gray-100">
-                    <button type="submit"
-                        class="px-8 py-2.5 bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-200 hover:bg-orange-700 active:scale-95 transition-all">
-                        Update Destinasi
-                    </button>
-                </div>
-            </form>
-        </div>
+            <div class="bg-gray-50/80 px-8 py-6 flex justify-end gap-4 border-t border-gray-100">
+                <button type="submit"
+                    class="px-10 py-3 bg-orange-600 text-white font-bold rounded-2xl shadow-lg shadow-orange-500/20 hover:bg-orange-700 active:scale-95 transition-all">
+                    Update Destinasi
+                </button>
+            </div>
+        </form>
+    </div>
 @endsection

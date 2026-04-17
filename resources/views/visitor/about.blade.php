@@ -1,6 +1,6 @@
 @extends('layouts.visitor')
 
-@section('title', 'Tentang Kami - Go Minahasa Luxury Travel')
+@section('title', 'Tentang Kami - Go Minahasa')
 
 @push('styles')
     <style>
